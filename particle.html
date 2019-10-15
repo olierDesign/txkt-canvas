@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        canvas {
+            width: 100%;
+            border: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="1300" height="500"></canvas>
+
+    <script>
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+        var setArr = [];
+        var maxNum = 30;
+
+        var timer = setInterval(function() {
+            if (setArr.length > maxNum) {
+                clearInterval(timer);
+            }
+            
+            var cx = 200 + Math.ceil(Math.random() * 200);
+            var cy = 200 + Math.ceil(Math.random() * 200);
+            var r = 5 + Math.ceil(Math.random() * 7);
+            var red = Math.floor(Math.random() * 256);
+            var green = Math.floor(Math.random() * 256);
+            var blue = Math.floor(Math.random() * 256);
+            var alpha = 0.5 + Math.random() * 0.3;
+            var sx = -2 + Math.ceil(Math.random() * 4);
+            var sy = -2 + Math.ceil(Math.random() * 4);
+            var bgcolor = `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+
+            var obj = {
+                cx: cx,
+                cy: cy,
+                r: r,
+                sx: sx,
+                sy: sy,
+                bgcolor: bgcolor
+                
+            }
+
+            if (sx != 0 || sy != 0) {
+                setArr.push(obj);
+            }
+        }, 1000/20);
+
+        var cx = 200;
+        var cy = 200;
+        var r = 10;
+
+        setInterval(function() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (var i = 0; i < setArr.length; i++) {
+                if (setArr[i].cy - setArr[i].r <= 0 || setArr[i].cy + setArr[i].r >= canvas.height) {
+                    // 触碰到上下边界
+                    setArr[i].sy *= -1;
+                }
+
+                if (setArr[i].cx - setArr[i].r <=0 || setArr[i].cx + setArr[i].r >= canvas.width) {
+                    // 触碰到左右边界
+                    setArr[i].sx *= -1;
+                }
+
+                // 绘制一个圆形
+                setArr[i].cx += setArr[i].sx;
+                setArr[i].cy += setArr[i].sy;
+
+                context.beginPath();
+                context.arc(setArr[i].cx, setArr[i].cy, setArr[i].r, 0, 2 * Math.PI);
+                context.fillStyle = setArr[i].bgcolor;
+                context.fill();
+            }
+            
+        }, 1000/60);
+
+        
+    </script>
+</body>
+</html>

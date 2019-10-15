@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvas" width="600" height="600"></canvas>
+
+    <script>
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+
+        var cx = canvas.width / 2;              // 圆心x轴
+        var cy = canvas.height / 2;             // 圆心y轴
+        var br = 200;                           // 大圆半径
+        var sr = 100;                           // 小圆半径
+
+        var startAngle = 0;                     // 扇形的开始角
+        var endAngle = 0;                       // 扇形的结束角
+        var speed = (2 / 360 ) * 2 * Math.PI;   // 速度
+
+        // 圆的颜色比例，用于获取当前应该使用的颜色
+        const setArr = [
+            {
+                scale: 0.25 * 2 * Math.PI,
+                color: 'red'
+            },
+            {
+                scale: 0.25 * 2 * Math.PI,
+                color: 'yellow'
+            },
+            {
+                scale: 0.25 * 2 * Math.PI,
+                color: 'blue'
+            },
+            {
+                scale: 0.25 * 2 * Math.PI,
+                color: 'green'
+            }
+        ];
+        // 获取圆的分界线
+        var dataArr = [0];
+        var sum = 0;
+        for (var i = 0; i < setArr.length; i++) {
+            sum += setArr[i].scale;
+            dataArr.push(sum);
+        }
+
+        // 循环画圆
+        var timer = setInterval(function() {
+            endAngle += speed;
+            
+            if (endAngle >= 2 * Math.PI) {
+                clearInterval(timer);
+            }
+
+            for (var i = 1; i < dataArr.length; i++) {
+                if (endAngle >= dataArr[i - 1] && endAngle <= dataArr[i]) {
+                    drow(startAngle, endAngle, setArr[i - 1].color);
+                }
+            }
+
+            startAngle = endAngle - 0.01;       // 去除毛边的 hack
+        }, 100 / 40);
+
+        // 绘制一个扇形
+        function drow(startAngle, endAngle, color) {
+            // 绘制大圆
+            context.beginPath();
+            context.moveTo(cx, cy);
+            context.lineTo(cx + br * Math.cos(startAngle), cy + br * Math.sin(startAngle));
+            context.arc(cx, cy, br, startAngle, endAngle);
+            context.lineTo(cx, cy);
+            context.fillStyle = color;
+            context.fill();
+
+            // 绘制小圆
+            context.beginPath();
+            context.moveTo(cx, cy);
+            context.lineTo(cx + sr * Math.cos(startAngle), cy + sr * Math.sin(startAngle));
+            context.arc(cx, cy, sr, startAngle, endAngle);
+            context.lineTo(cx, cy);
+            // 去除毛边的 hack
+            context.fillStyle = 'white';
+            context.strokeStyle = 'white';
+            context.lineWidth = 2;
+            context.fill();
+            context.stroke()
+        }
+    </script>
+</body>
+</html>
